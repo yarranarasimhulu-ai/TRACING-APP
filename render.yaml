@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: langchain-tracer
+    env: python
+    region: ohio # You can change this to your preferred region (e.g., frankfurt, oregon, singapore)
+    buildCommand: |
+      # 1. Install Node.js (Render's Python environment doesn't have it by default)
+      curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+      apt-get install -y nodejs
+      
+      # 2. Build the React Frontend
+      cd frontend
+      npm install
+      npm run build
+      cd ..
+      
+      # 3. Install Python Backend Dependencies
+      pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DATABASE_URL
+        sync: false # You MUST add your Supabase Pooler URL in the Render Dashboard
+      - key: PYTHON_VERSION
+        value: 3.11.0 # Ensure a modern Python version is used
